@@ -146,8 +146,10 @@ foreach(_uart_line IN LISTS UART_PIN_LINES)
 
 endforeach()
 if(_uart_channel_index EQUAL 0)
-	message(WARNING "UART pin configuration is empty; build may fail when generating uart_config.inc")
+	message(FATAL_ERROR "UART pin configuration is empty; define at least one UART channel")
 endif()
+
+set(CFG_TUD_CDC_VALUE "${_uart_channel_index}")
 
 set(I2C_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/i2c_config.txt" CACHE FILEPATH "I2C bridge configuration file")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${I2C_CONFIG_FILE}")
@@ -163,12 +165,6 @@ endif()
 unset(ENABLE_USB_I2C CACHE)
 set(ENABLE_USB_I2C "${I2C_CFG_ENABLED}")
 
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/tusb_config.h" TUSB_CONFIG_CONTENT)
-string(REGEX MATCH "#define[ \t]+CFG_TUD_CDC[ \t]+([0-9]+)" _ "${TUSB_CONFIG_CONTENT}")
-if(NOT CMAKE_MATCH_1)
-	message(FATAL_ERROR "Unable to determine CFG_TUD_CDC from tusb_config.h")
-endif()
-set(CFG_TUD_CDC_VALUE "${CMAKE_MATCH_1}")
 set(GENERATED_UART_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/generated/uart_config.inc")
 set(GENERATED_I2C_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/generated/i2c_config.inc")
 
@@ -211,7 +207,9 @@ target_include_directories(uart_i2c_bridge PUBLIC
 	../pico-sdk/lib/tinyusb/src
 	${CMAKE_CURRENT_BINARY_DIR}/generated)
 
-target_compile_definitions(uart_i2c_bridge PRIVATE ENABLE_USB_I2C=$<BOOL:${ENABLE_USB_I2C}>)
+target_compile_definitions(uart_i2c_bridge PRIVATE
+	ENABLE_USB_I2C=$<BOOL:${ENABLE_USB_I2C}>
+	CFG_TUD_CDC=${CFG_TUD_CDC_VALUE})
 
 set(UART_I2C_BRIDGE_LIBS
 	pico_multicore

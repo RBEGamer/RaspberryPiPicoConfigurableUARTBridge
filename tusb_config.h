@@ -16,7 +16,9 @@
 
 #define CFG_TUSB_RHPORT0_MODE OPT_MODE_DEVICE
 
+#ifndef CFG_TUD_CDC
 #define CFG_TUD_CDC 6
+#endif
 #define CFG_TUD_CDC_RX_BUFSIZE 1024  // no harm making these bigger I guess
 #define CFG_TUD_CDC_TX_BUFSIZE 1024
 
