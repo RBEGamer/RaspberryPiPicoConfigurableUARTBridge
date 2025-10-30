@@ -1,2 +1,7 @@
 .vscode
-build
+build/
+build-pico2/
+build-pico/
+generated/
+_deps/
+CMakeFiles/

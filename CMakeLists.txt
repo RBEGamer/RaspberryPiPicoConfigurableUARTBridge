@@ -9,6 +9,7 @@ project(pico_uart_i2c_bridge)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/i2c_config_common.cmake)
 
 set(UART_PIN_CONFIG "${CMAKE_CURRENT_SOURCE_DIR}/uart_config.txt" CACHE FILEPATH "UART pin configuration file")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${UART_PIN_CONFIG}")
 message(STATUS "Using UART pin configuration: ${UART_PIN_CONFIG}")
 
 file(READ "${UART_PIN_CONFIG}" UART_PIN_RAW_CONTENT)
@@ -149,6 +150,7 @@ if(_uart_channel_index EQUAL 0)
 endif()
 
 set(I2C_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/i2c_config.txt" CACHE FILEPATH "I2C bridge configuration file")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${I2C_CONFIG_FILE}")
 message(STATUS "Using I2C configuration: ${I2C_CONFIG_FILE}")
 parse_i2c_config("${I2C_CONFIG_FILE}")
 

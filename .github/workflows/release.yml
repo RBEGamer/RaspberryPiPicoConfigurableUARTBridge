@@ -33,10 +33,8 @@ jobs:
           git submodule update --init --recursive
       - name: 'Configure'
         run: |
-          mkdir -p build-pico
-          cmake -B build-pico
-          mkdir -p build-pico2
-          cmake -B build-pico2 -DPICO_BOARD=pico2
+          cmake -B build-pico -DPICO_BOARD=pico -S .
+          cmake -B build-pico2 -DPICO_BOARD=pico2 -S .
       - name: 'Build'
         run: |
           make -C build-pico

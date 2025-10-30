@@ -9,7 +9,9 @@
 #include <hardware/irq.h>
 #include <hardware/structs/sio.h>
 #include <hardware/uart.h>
+#if ENABLE_USB_I2C
 #include "hardware/i2c.h"
+#endif
 #include <hardware/structs/pio.h>
 #include <pico/multicore.h>
 #include <pico/stdlib.h>
