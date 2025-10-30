@@ -1,0 +1,3 @@
+# I2C bridge configuration
+# Format: ENABLED=0|1 SDA=<pin> SCL=<pin> [LED=<pin>]
+ENABLED=1 SDA=26 SCL=27 LED=14

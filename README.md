@@ -12,17 +12,64 @@ History
 ----------
 
 This expands [JoeSc's](https://github.com/JoeSc/pico-sexa-uart-bridge) project to add activity LED for each UART which itself expands [Noltari's](https://github.com/Noltari/pico-uart-bridge) project to add 4 additional UARTs using the pico PIOs. And expands on [harrywalsh's](https://github.com/harrywalsh/pico-hw_and_pio-uart-gridge) project to provide better SEO and remove some data loss when using all 6 UARTs concurrently.
-
 It then has [Nicolai-Electronics's](https://github.com/Nicolai-Electronics/rp2040-i2c-interface) project for i2c-tiny-usb support merged in.
+[8086net's](https://github.com/8086net/pico-sexa-uart-bridge) pico-sexa-uart-bridge which provides a static code configured six uart and one i2c port.
+
+This repository uses a dedicated configuration file `uart_config.txt`.
 
 Disclaimer
 ----------
 
 This software is provided without warranty, according to the MIT License, and should therefore not be used where it may endanger life, financial stakes, or cause discomfort and inconvenience to others.
 
+Configuration
+-------------
+UART pin mappings live in `uart_config.txt`. Each non-comment line
+specifies one CDC interface using the format:
+
+```
+TX=<pin> RX=<pin> LED=<pin> [UART=0|1|PIO=<sm>]
+```
+
+- `TX`, `RX`, and `LED` are mandatory and refer to Pico GPIO numbers.
+- `UART=0`/`UART=1` can be added to force use of the hardware UART instances.
+- `PIO=<sm>` assigns a specific PIO state machine (0–3). When neither option is
+  present the build fills hardware UART0, then UART1, and finally the PIO
+  state machines in ascending order.
+
+The generated `uart_config.inc` is included by `uart-i2c-bridge.c` during the
+build, so any edit to the configuration file is picked up automatically at the
+next configure step.
+
+I2C behaviour is controlled by `i2c_config.txt`:
+
+```
+ENABLED=0|1 SDA=<pin> SCL=<pin> [LED=<pin>]
+```
+
+- Set `ENABLED=1` to expose the vendor-class I2C bridge, or `0` to compile it
+  out entirely.
+- When enabled, `SDA` and `SCL` must be a valid pin pair for the RP2040. The
+  build deduces whether `i2c0` or `i2c1` should be used from the supplied pins.
+- `LED` defaults to GPIO14 if omitted.
+
+The repository ships with:
+
+```
+ENABLED=1 SDA=26 SCL=27 LED=14
+```
+
+matching the Pico's default `i2c1` pins and the activity LED used by the
+reference hardware. Switch `ENABLED=0` to remove the vendor interface from the
+firmware without touching the source.
+
+The parser emits `i2c_config.inc`, which provides the pin macros consumed by
+`uart-i2c-bridge.c`. Editing either configuration file triggers regeneration
+as part of the next build.
+
 Raspberry Pi Pico Pinout
 ------------------------
-The pinout can easily be modified in uart-i2c-bridge.c but below is the default
+The default configuration below matches the contents of `uart_config.txt`:
 
 | Raspberry Pi Pico GPIO | Function |
 |:----------------------:|:--------:|
@@ -48,3 +95,19 @@ The pinout can easily be modified in uart-i2c-bridge.c but below is the default
 | GPIO27 (Pin 32)        | I2C SCL |
 | GPIO14 (Pin 19)        | I2C Activity LED |
 | GPIO15 (Pin 20)        | Power LED |
+
+Building
+--------
+The project uses CMake together with the Pico SDK. After installing the
+toolchain, generate the build system and compile the firmware:
+
+```bash
+cmake -B build -S .
+cmake --build build
+```
+
+By default the build uses `i2c_config.txt`; supply
+`-DI2C_CONFIG_FILE=/path/to/i2c_config.txt` or
+`-DUART_PIN_CONFIG=/path/to/uart_config.txt` to point at alternate presets.
+
+The generated artifacts (UF2, ELF, map, etc.) are written inside `build/`.

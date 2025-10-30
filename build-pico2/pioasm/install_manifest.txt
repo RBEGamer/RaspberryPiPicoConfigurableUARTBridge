@@ -1,0 +1,5 @@
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm-install/pioasm/pioasm
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm-install/pioasm/pioasmTargets.cmake
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm-install/pioasm/pioasmTargets-release.cmake
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm-install/pioasm/pioasmConfig.cmake
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm-install/pioasm/pioasmConfigVersion.cmake

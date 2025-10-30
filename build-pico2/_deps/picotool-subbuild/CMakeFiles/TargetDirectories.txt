@@ -1,0 +1,3 @@
+/workspaces/pico-sexa-uart-bridge/build-pico2/_deps/picotool-subbuild/CMakeFiles/picotool-populate.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/_deps/picotool-subbuild/CMakeFiles/edit_cache.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/_deps/picotool-subbuild/CMakeFiles/rebuild_cache.dir

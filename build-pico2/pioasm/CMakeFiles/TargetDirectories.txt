@@ -1,0 +1,7 @@
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/pioasm.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/edit_cache.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/rebuild_cache.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/list_install_components.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/install.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/install/local.dir
+/workspaces/pico-sexa-uart-bridge/build-pico2/pioasm/CMakeFiles/install/strip.dir

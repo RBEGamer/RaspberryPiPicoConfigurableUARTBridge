@@ -20,6 +20,11 @@
 #include <hardware/flash.h>
 #include "serial.h"
 #include "kernel_i2c_flags.h"
+#include "i2c_config.inc"
+
+#if ENABLE_USB_I2C != I2C_BRIDGE_ENABLED
+#error "ENABLE_USB_I2C compile flag does not match i2c_config.txt"
+#endif
 
 #if !defined(MIN)
 #define MIN(a, b) ((a > b) ? b : a)
@@ -36,13 +41,10 @@
 #define DEF_PARITY 0
 #define DEF_DATA_BITS 8
 
-#define I2C_INST i2c1
-#define I2C_SDA  26
-#define I2C_SCL  27
-
 #define POWER_LED 15
 
 /* commands from USB, must e.g. match command ids in kernel driver */
+#if ENABLE_USB_I2C
 #define CMD_ECHO       0
 #define CMD_GET_FUNC   1
 #define CMD_SET_DELAY  2
@@ -50,7 +52,9 @@
 #define CMD_I2C_IO     4
 #define CMD_I2C_BEGIN  1  // flag fo I2C_IO
 #define CMD_I2C_END    2  // flag fo I2C_IO
+#endif
 
+#if ENABLE_USB_I2C
 const unsigned long i2c_func = I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
 
 #define STATUS_IDLE        0
@@ -61,8 +65,9 @@ static uint8_t i2c_state = STATUS_IDLE;
 
 uint8_t i2c_data[1024] = {0};
 
-uint8_t led_i2c_pin = 14;
+uint8_t led_i2c_pin = I2C_LED_PIN;
 uint32_t led_i2c_ticker;
+#endif
 
 typedef struct {
 	uart_inst_t *const inst;
@@ -88,42 +93,9 @@ typedef struct {
 	uint32_t led_act_ticker;
 } uart_data_t;
 
+/* Pin assignment table is generated from uart_config.txt during the build. */
 uart_id_t UART_ID[CFG_TUD_CDC] = {
-	{
-		.inst = uart0,
-		.tx_pin = 0,
-		.rx_pin = 1,
-		.led_act_pin = 2,
-	},{
-		.inst = uart1,
-		.tx_pin = 4,
-		.rx_pin = 5,
-		.led_act_pin = 3
-	},{
-		.inst = 0,
-		.tx_pin = 8,
-		.rx_pin = 9,
-		.sm = 0,
-		.led_act_pin = 6,
-	},{
-		.inst = 0,
-		.tx_pin = 12,
-		.rx_pin = 13,
-		.sm = 1,
-		.led_act_pin = 7,
-	},{
-		.inst = 0,
-		.tx_pin = 16,
-		.rx_pin = 17,
-		.sm = 2,
-		.led_act_pin = 10,
-	},{
-		.inst = 0,
-		.tx_pin = 20,
-		.rx_pin = 21,
-		.sm = 3,
-		.led_act_pin = 11,
-	}
+#include "uart_config.inc"
 };
 
 uart_data_t UART_DATA[CFG_TUD_CDC];
@@ -279,13 +251,14 @@ void core1_entry(void)
 				usb_cdc_process(itf);
 			}
 		}
-
+#if ENABLE_USB_I2C
 		if (led_i2c_ticker) {
 			gpio_put(led_i2c_pin, 1);
 			led_i2c_ticker--;
 		} else {
 			gpio_put(led_i2c_pin, 0);
 		}
+#endif
 	}
 }
 
@@ -433,6 +406,7 @@ void init_uart_data(uint8_t itf) {
 	}
 }
 
+#if ENABLE_USB_I2C
 bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const* request) {
     if (request->bmRequestType_bit.type == TUSB_REQ_TYPE_VENDOR) {
 	led_i2c_ticker = LED_TICKER_COUNT;
@@ -522,6 +496,20 @@ bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const
     (void) request;
     return true;
 }
+#else
+bool tud_vendor_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const* request) {
+    (void) rhport;
+    (void) stage;
+    (void) request;
+    return false;
+}
+
+bool tud_vendor_control_complete_cb(uint8_t rhport, tusb_control_request_t const* request) {
+    (void) rhport;
+    (void) request;
+    return true;
+}
+#endif
 
 int main(void)
 {
@@ -541,6 +529,7 @@ int main(void)
 	gpio_set_dir(POWER_LED, GPIO_OUT);
 	gpio_put(POWER_LED, 1);
 
+#if ENABLE_USB_I2C
 	gpio_init(I2C_SDA);
 	gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
 	gpio_pull_up(I2C_SDA);
@@ -555,6 +544,7 @@ int main(void)
 	gpio_set_dir(led_i2c_pin, GPIO_OUT);
 	gpio_put(led_i2c_pin, 0);
 	led_i2c_ticker = 0;
+#endif
 
 	init_usb_cdc_serial_num();
 
@@ -573,4 +563,3 @@ int main(void)
 
 	return 0;
 }
-

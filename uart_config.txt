@@ -1,0 +1,10 @@
+# Default UART channel mapping.
+# Format: TX=<pin> RX=<pin> LED=<pin> [UART=0|1|PIO=<sm>]
+# Explicit UART/PIO assignments are optional; when omitted the build
+# will use uart0, then uart1, then fall back to PIO state machines.
+TX=0 RX=1 LED=2
+TX=4 RX=5 LED=3
+TX=8 RX=9 LED=6
+TX=12 RX=13 LED=7
+TX=16 RX=17 LED=10
+TX=20 RX=21 LED=11
