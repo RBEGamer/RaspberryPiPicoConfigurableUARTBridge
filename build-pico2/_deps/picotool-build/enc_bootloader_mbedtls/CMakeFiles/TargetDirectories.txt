@@ -1,2 +1,0 @@
-/workspaces/pico-sexa-uart-bridge/build-pico2/_deps/picotool-build/enc_bootloader_mbedtls/CMakeFiles/edit_cache.dir
-/workspaces/pico-sexa-uart-bridge/build-pico2/_deps/picotool-build/enc_bootloader_mbedtls/CMakeFiles/rebuild_cache.dir
